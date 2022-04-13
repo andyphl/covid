@@ -1,39 +1,49 @@
+import { useEffect } from "react";
 import { Overlay, Popover, Spinner } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import {
   selectCountriesCovid,
   selectCountriesCovidStatus,
 } from "../../slice/countriesCovidSlice";
-const MapChartPopover = ({
+
+const CustomPopover = ({
   popoverContainerRef,
-  targetCountryDOM,
-  countryName,
-  countryISO,
-  isShowCountryPopover,
+  popoverTargetDOM,
+  popoverData,
+  isPopoverShow,
 }) => {
+  if (!popoverData) return null;
+
   const countriesCovid = useSelector(selectCountriesCovid);
   const countriesCovidStatus = useSelector(selectCountriesCovidStatus);
-
   const target = countriesCovid.find(
-    (country) => country.ThreeLetterSymbol === countryISO.toLowerCase()
+    (country) => country.ThreeLetterSymbol === popoverData.ISO_A3.toLowerCase()
   );
+
+  // useEffect(() => {
+  //   console.log("ref change", popoverContainerRef);
+  // }, [popoverContainerRef]);
+
+  // useEffect(() => {
+  //   console.log("target change", popoverTargetDOM.nodeName);
+  // }, [popoverTargetDOM]);
 
   return (
     <Overlay
       placement="top"
       containerPadding={50}
       container={popoverContainerRef}
-      target={targetCountryDOM}
-      show={isShowCountryPopover}
+      target={popoverTargetDOM}
+      show={isPopoverShow}
     >
       <Popover>
         <Popover.Header as="h3" className="bg-secondary text-light">
-          {countryName}
+          {popoverData.NAME}
         </Popover.Header>
         <Popover.Body>
           {countriesCovidStatus !== "succeeded" ? (
             <Spinner
-              className="mx-auto text-primary"
+              className="d-block mx-auto text-primary"
               animation="border"
               role="status"
             >
@@ -54,4 +64,4 @@ const MapChartPopover = ({
   );
 };
 
-export default MapChartPopover;
+export default CustomPopover;
