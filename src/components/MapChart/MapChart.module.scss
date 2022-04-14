@@ -1,4 +1,25 @@
+@import "../../styles/bsVariable";
+
 .map {
   height: 70%;
   width: 400px;
+}
+
+.resetBtn {
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  path {
+    stroke: $red;
+  }
+
+  &:hover path {
+    stroke: #fff;
+  }
 }

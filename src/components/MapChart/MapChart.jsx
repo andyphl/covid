@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useState, memo, useRef, useEffect } from "react";
+import { useState, memo, useRef, useEffect, useCallback } from "react";
 import {
   ComposableMap,
   Geographies,
@@ -7,10 +7,12 @@ import {
   ZoomableGroup,
   Sphere,
 } from "react-simple-maps";
+import { Button } from "react-bootstrap";
 import MapPopover from "./MapPopover";
 import MapPopoverContent from "./MapPopoverContent";
 import usePopover from "./usePopover";
 import styled from "./MapChart.module.scss";
+import { GrPowerReset } from "react-icons/gr";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-50m.json";
@@ -22,8 +24,8 @@ const Geography = memo(
 
 const MapChart = () => {
   const [country, setCountry] = useState(null);
-  // const ref = useRef(null);
-  // const [position, setPosition] = useState({ coordinates: [0, 0], zoom: 1 });
+  const zoomGroupRef = useRef(null);
+  const [position, setPosition] = useState({ coordinates: [0, 0], zoom: 1 });
   const {
     popoverContainerRef,
     isPopoverShow,
@@ -33,12 +35,12 @@ const MapChart = () => {
     setPopoverTargetDOM,
   } = usePopover();
 
-  // useEffect(() => {
-  //   ref.current = document.querySelector(".rsm-zoomable-group");
-  // }, []);
+  const resetCenter = useCallback(() => {
+    setPosition({ coordinates: [0, 0], zoom: 1 });
+  }, []);
 
   return (
-    <div ref={popoverContainerRef} className="container  h-100">
+    <div ref={popoverContainerRef} className="container h-100">
       <MapPopover
         popoverContainerRef={popoverContainerRef}
         popoverTargetDOM={popoverTargetDOM}
@@ -48,31 +50,14 @@ const MapChart = () => {
       >
         <MapPopoverContent country={country} />
       </MapPopover>
-      <div className="row h-100 align-items-center">
-        <ComposableMap
-          className={classNames("border border-5 border-info col", styled.map)}
-        >
+      <div className="row h-100 align-items-center position-relative">
+        <ComposableMap className={classNames("col", styled.map)}>
           <ZoomableGroup
-          // center={position.coordinates}
-          // zoom={position.zoom}
-          // onMoveEnd={(pos) => {
-          //   setPosition(pos);
-          //   // console.log(pos.coordinates);
-          // }}
-          // onMove={
-          //   onMapMove
-          //   (e) => {
-          //   let zoomAttr = ref.current.getAttribute("transform");
-          //   console.log(zoomAttr);
-          //   console.log(e.y);
-          //   if (e.y > 400) {
-          //     ref.current.setAttribute(
-          //       "transform",
-          //       zoomAttr.replace(e.y.toString(), "400")
-          //     );
-          //   }
-          // }
-          // }
+            center={position.coordinates}
+            zoom={position.zoom}
+            onMoveEnd={(position) => {
+              setPosition(position);
+            }}
           >
             <Sphere stroke="#ddd" strokeWidth={1} />
             <Geographies geography={geoUrl}>
@@ -108,6 +93,14 @@ const MapChart = () => {
             </Geographies>
           </ZoomableGroup>
         </ComposableMap>
+        <Button
+          type="reset"
+          variant="outline-danger rounded-pill"
+          className={classNames("position-absolute", styled.resetBtn)}
+          onClick={resetCenter}
+        >
+          <GrPowerReset />
+        </Button>
       </div>
     </div>
   );
