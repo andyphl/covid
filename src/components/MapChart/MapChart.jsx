@@ -54,7 +54,10 @@ const MapChart = () => {
   }, []);
 
   return (
-    <div ref={popoverContainerRef} className="container h-100">
+    <div
+      ref={popoverContainerRef}
+      className="container h-100 bg-light shadow-lg"
+    >
       <MapPopover
         popoverContainerRef={popoverContainerRef}
         popoverTargetDOM={popoverTargetDOM}
@@ -65,7 +68,7 @@ const MapChart = () => {
         <MapPopoverContent country={country} />
       </MapPopover>
       <div className="row h-100 align-items-center position-relative">
-        <ComposableMap className={classNames("col", styled.map)}>
+        <ComposableMap className={classNames("col p-0", styled.map)}>
           <ZoomableGroup
             center={position.coordinates}
             zoom={position.zoom}
