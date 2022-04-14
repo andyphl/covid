@@ -7,12 +7,13 @@ import {
   ZoomableGroup,
   Sphere,
 } from "react-simple-maps";
-import { Button } from "react-bootstrap";
+import { Button, ButtonGroup } from "react-bootstrap";
 import MapPopover from "./MapPopover";
 import MapPopoverContent from "./MapPopoverContent";
 import usePopover from "./usePopover";
 import styled from "./MapChart.module.scss";
 import { GrPowerReset } from "react-icons/gr";
+import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-50m.json";
@@ -24,7 +25,6 @@ const Geography = memo(
 
 const MapChart = () => {
   const [country, setCountry] = useState(null);
-  const zoomGroupRef = useRef(null);
   const [position, setPosition] = useState({ coordinates: [0, 0], zoom: 1 });
   const {
     popoverContainerRef,
@@ -35,8 +35,22 @@ const MapChart = () => {
     setPopoverTargetDOM,
   } = usePopover();
 
-  const resetCenter = useCallback(() => {
+  const resetPosition = useCallback(() => {
     setPosition({ coordinates: [0, 0], zoom: 1 });
+  }, []);
+
+  const zoomIn = useCallback(() => {
+    setPosition((prevPosition) => ({
+      ...prevPosition,
+      zoom: prevPosition.zoom < 8 ? prevPosition.zoom + 0.5 : 8,
+    }));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setPosition((prevPosition) => ({
+      ...prevPosition,
+      zoom: prevPosition.zoom > 1 ? prevPosition.zoom - 0.5 : 1,
+    }));
   }, []);
 
   return (
@@ -93,14 +107,34 @@ const MapChart = () => {
             </Geographies>
           </ZoomableGroup>
         </ComposableMap>
-        <Button
-          type="reset"
-          variant="outline-danger rounded-pill"
-          className={classNames("position-absolute", styled.resetBtn)}
-          onClick={resetCenter}
+        <ButtonGroup
+          className={classNames("position-absolute", styled.mapBtns)}
         >
-          <GrPowerReset />
-        </Button>
+          <Button
+            type="button"
+            variant="outline-success rounded-pill"
+            className={styled.zoomInBtn}
+            onClick={zoomIn}
+          >
+            <AiOutlinePlus />
+          </Button>
+          <Button
+            type="reset"
+            variant="outline-danger rounded-pill"
+            className={styled.resetBtn}
+            onClick={resetPosition}
+          >
+            <GrPowerReset />
+          </Button>
+          <Button
+            type="button"
+            variant="outline-success rounded-pill"
+            className={styled.zoomOutBtn}
+            onClick={zoomOut}
+          >
+            <AiOutlineMinus />
+          </Button>
+        </ButtonGroup>
       </div>
     </div>
   );

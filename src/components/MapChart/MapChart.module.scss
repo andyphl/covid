@@ -3,20 +3,46 @@
 .map {
   height: 70%;
   width: 400px;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 
-.resetBtn {
+.mapBtns {
+  padding: 0;
+  width: 40px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
   top: 50%;
   right: 10px;
   transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 
+  button {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.resetBtn {
   path {
     stroke: $red;
+  }
+  &:hover path {
+    stroke: #fff;
+  }
+}
+
+.zoomInBtn,
+.zoomOutBtn {
+  path {
+    stroke: $green;
   }
 
   &:hover path {
