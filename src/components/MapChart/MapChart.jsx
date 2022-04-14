@@ -83,7 +83,7 @@ const MapChart = () => {
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    fill="#DDD"
+                    fill="#999"
                     stroke="#FFF"
                     style={{
                       default: { outline: "none" },
