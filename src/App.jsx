@@ -21,10 +21,12 @@ const App = () => {
   return (
     <BrowserRouter>
       <Menu />
-      <Routes>
-        <Route path="/" exact element={<HomePage />} />
-        <Route path="/:country" element={<CountryPage />} />
-      </Routes>
+      <main>
+        <Routes>
+          <Route path="/" exact element={<HomePage />} />
+          <Route path="/:country" element={<CountryPage />} />
+        </Routes>
+      </main>
     </BrowserRouter>
   );
 };
