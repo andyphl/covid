@@ -4,7 +4,6 @@ const usePopover = () => {
   const popoverContainerRef = useRef(null);
   const [isPopoverShow, setIsPopoverShow] = useState(false);
   const [popoverTargetDOM, setPopoverTargetDOM] = useState(null);
-  const [popoverData, setPopoverData] = useState(null);
 
   const showPopover = useCallback((e) => {
     setIsPopoverShow(true);
@@ -26,11 +25,9 @@ const usePopover = () => {
     popoverContainerRef,
     isPopoverShow,
     popoverTargetDOM,
-    popoverData,
     showPopover,
     hidePopover,
     setPopoverTargetDOM,
-    setPopoverData,
   };
 };
 

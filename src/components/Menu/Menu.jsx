@@ -8,6 +8,7 @@ import classNames from "classnames";
 const Menu = () => {
   return (
     <Navbar
+      fixed="top"
       expand="lg"
       className="shadow border-3 border-bottom border-primary bg-white"
     >
