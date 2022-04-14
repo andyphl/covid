@@ -1,82 +1,141 @@
-import { useRef, useState } from "react";
-import { Overlay, Popover } from "react-bootstrap";
+import classNames from "classnames";
+import { useState, memo, useRef, useEffect, useCallback } from "react";
 import {
   ComposableMap,
   Geographies,
-  Geography,
+  Geography as G,
   ZoomableGroup,
   Sphere,
 } from "react-simple-maps";
+import { Button, ButtonGroup } from "react-bootstrap";
+import MapPopover from "./MapPopover";
+import MapPopoverContent from "./MapPopoverContent";
+import usePopover from "./usePopover";
 import styled from "./MapChart.module.scss";
+import { GrPowerReset } from "react-icons/gr";
+import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-50m.json";
 
-const MapChart = () => {
-  const [showCountryInfo, setShowCountryInfo] = useState(false);
-  const [targetCountryDOM, setTargetCountryDOM] = useState(null);
-  const [targetCountryInfo, setTargetCountryInfo] = useState(null);
-  const popoverContainerRef = useRef(null);
+const Geography = memo(
+  (props) => <G {...props} />,
+  (prevProps, nextProps) => true
+);
 
-  const showCountryPopover = (e, geoProperties) => {
-    setShowCountryInfo(true);
-    setTargetCountryDOM(e.target);
-    console.log(geoProperties);
-    setTargetCountryInfo(geoProperties);
-  };
+const MapChart = () => {
+  const [country, setCountry] = useState(null);
+  const [position, setPosition] = useState({ coordinates: [0, 0], zoom: 1 });
+  const {
+    popoverContainerRef,
+    isPopoverShow,
+    popoverTargetDOM,
+    showPopover,
+    hidePopover,
+    setPopoverTargetDOM,
+  } = usePopover();
+
+  const resetPosition = useCallback(() => {
+    setPosition({ coordinates: [0, 0], zoom: 1 });
+  }, []);
+
+  const zoomIn = useCallback(() => {
+    setPosition((prevPosition) => ({
+      ...prevPosition,
+      zoom: prevPosition.zoom < 8 ? prevPosition.zoom + 0.5 : 8,
+    }));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setPosition((prevPosition) => ({
+      ...prevPosition,
+      zoom: prevPosition.zoom > 1 ? prevPosition.zoom - 0.5 : 1,
+    }));
+  }, []);
 
   return (
-    <div ref={popoverContainerRef}>
-      <Overlay
+    <div ref={popoverContainerRef} className="container h-100">
+      <MapPopover
+        popoverContainerRef={popoverContainerRef}
+        popoverTargetDOM={popoverTargetDOM}
+        isPopoverShow={isPopoverShow}
         placement="top"
-        containerPadding={20}
-        container={popoverContainerRef}
-        target={targetCountryDOM}
-        show={showCountryInfo}
+        containerPadding={50}
       >
-        <Popover>
-          <Popover.Header as="h3" className="bg-primary">
-            {targetCountryInfo?.NAME}
-          </Popover.Header>
-          <Popover.Body>ISO_A3: {targetCountryInfo?.ISO_A3}</Popover.Body>
-        </Popover>
-      </Overlay>
-      <ComposableMap className={styled.container}>
-        <ZoomableGroup>
-          <Sphere stroke="#ff5533" strokeWidth={1} />
-          <Geographies geography={geoUrl}>
-            {({ geographies }) =>
-              geographies.map((geo) => {
-                return (
-                  <>
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      fill="#DDD"
-                      stroke="#FFF"
-                      style={{
-                        default: { outline: "none" },
-                        hover: {
-                          outline: "none",
-                          fill: "crimson",
-                          cursor: "pointer",
-                        },
-                        pressed: { outline: "none" },
-                      }}
-                      onMouseEnter={(e) => {
-                        showCountryPopover(e, geo.properties);
-                      }}
-                      onClick={() => {
-                        console.log(popoverContainerRef);
-                      }}
-                    />
-                  </>
-                );
-              })
-            }
-          </Geographies>
-        </ZoomableGroup>
-      </ComposableMap>
+        <MapPopoverContent country={country} />
+      </MapPopover>
+      <div className="row h-100 align-items-center position-relative">
+        <ComposableMap className={classNames("col", styled.map)}>
+          <ZoomableGroup
+            center={position.coordinates}
+            zoom={position.zoom}
+            onMoveEnd={(position) => {
+              setPosition(position);
+            }}
+          >
+            <Sphere stroke="#ddd" strokeWidth={1} />
+            <Geographies geography={geoUrl}>
+              {({ geographies }) =>
+                geographies.map((geo) => (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill="#DDD"
+                    stroke="#FFF"
+                    style={{
+                      default: { outline: "none" },
+                      hover: {
+                        outline: "none",
+                        fill: "crimson",
+                        cursor: "pointer",
+                      },
+                      pressed: { outline: "none" },
+                    }}
+                    onMouseEnter={(e) => {
+                      setCountry({
+                        name: geo.properties.NAME,
+                        iso: geo.properties.ISO_A3.toLowerCase(),
+                      });
+                      setPopoverTargetDOM(e.target);
+                      showPopover();
+                    }}
+                    onMouseLeave={hidePopover}
+                    onClick={() => {}}
+                  />
+                ))
+              }
+            </Geographies>
+          </ZoomableGroup>
+        </ComposableMap>
+        <ButtonGroup
+          className={classNames("position-absolute", styled.mapBtns)}
+        >
+          <Button
+            type="button"
+            variant="outline-success rounded-pill"
+            className={styled.zoomInBtn}
+            onClick={zoomIn}
+          >
+            <AiOutlinePlus />
+          </Button>
+          <Button
+            type="reset"
+            variant="outline-danger rounded-pill"
+            className={styled.resetBtn}
+            onClick={resetPosition}
+          >
+            <GrPowerReset />
+          </Button>
+          <Button
+            type="button"
+            variant="outline-success rounded-pill"
+            className={styled.zoomOutBtn}
+            onClick={zoomOut}
+          >
+            <AiOutlineMinus />
+          </Button>
+        </ButtonGroup>
+      </div>
     </div>
   );
 };

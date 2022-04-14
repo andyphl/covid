@@ -1,8 +1,9 @@
 import { MapChart } from "../../components";
+import styled from "./HomePage.module.scss";
 
 const HomePage = () => {
   return (
-    <div>
+    <div className={styled.homePage}>
       <MapChart />
     </div>
   );
